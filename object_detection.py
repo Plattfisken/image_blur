@@ -12,7 +12,6 @@ def get_file_extension(file_name):
     return reversed_file_extension[::-1]
 
 image_file_paths = sys.argv[1::]
-print(image_file_paths)
 images = [Image.open(arg) for arg in sys.argv[1::]]
 
 processor = DetrImageProcessor.from_pretrained("facebook/detr-resnet-50", revision="no_timm")
