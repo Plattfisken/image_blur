@@ -27,7 +27,7 @@ target_sizes = torch.tensor(sizes)
 
 results = processor.post_process_object_detection(outputs, target_sizes=target_sizes, threshold=0.1)
 
-for result, image_path, i in zip(results, image_file_paths, range(0, len(results))):
+for result, image_path in zip(results, image_file_paths):
     image = cv2.imread(image_path)
     ksize = (40, 40)
     for box, label in zip(result["boxes"], result["labels"]):
