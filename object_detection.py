@@ -4,6 +4,7 @@ import torch
 import sys
 import cv2
 import datetime
+import os
 
 def get_file_extension(file_name):
     reversed_file_name = file_name[::-1]
@@ -24,11 +25,12 @@ sizes = [image.size[::-1] for image in images]
 
 target_sizes = torch.tensor(sizes)
 
-results = processor.post_process_object_detection(outputs, target_sizes=target_sizes, threshold=0.1)
+results = processor.post_process_object_detection(outputs, target_sizes=target_sizes, threshold=0.5)
 
+os.makedirs("./results", exist_ok=True)
 for result, image_path in zip(results, image_file_paths):
     image = cv2.imread(image_path)
-    ksize = (40, 40)
+    ksize = (30, 30)
     for box, label in zip(result["boxes"], result["labels"]):
         if(model.config.id2label[label.item()] == "person"):
             # extract coordinates and round from box
@@ -41,5 +43,5 @@ for result, image_path in zip(results, image_file_paths):
             # insert blur back into image
             image[y1:y2, x1:x2] = blur
     now = datetime.datetime.now()
-    cv2.imwrite(f"{now.year}-{now.month}-{now.day}-{now.hour}-{now.minute}-{now.second}-{now.microsecond}.{get_file_extension(image_path)}", image)
+    cv2.imwrite(f"./results/{now.year}-{now.month}-{now.day}-{now.hour}-{now.minute}-{now.second}-{now.microsecond}.{get_file_extension(image_path)}", image)
 
