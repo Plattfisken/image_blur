@@ -39,7 +39,7 @@ for result, image_path in zip(results, image_file_paths):
             x1, y1, x2, y2 = box[0], box[1], box[2], box[3]
             # rectangle to blur from image
             roi = image[y1:y2, x1:x2]
-            # apply rectangle
+            # apply blur to rectangle
             blur = cv2.blur(roi, ksize)
             # insert blur back into image
             image[y1:y2, x1:x2] = blur
