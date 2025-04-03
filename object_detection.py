@@ -12,6 +12,7 @@ def get_file_extension(file_name):
     reversed_file_extension = reversed_file_name[:last_dot_index]
     return reversed_file_extension[::-1]
 
+# TODO: hantera exceptions
 image_file_paths = sys.argv[1::]
 images = [Image.open(arg) for arg in sys.argv[1::]]
 
@@ -43,5 +44,6 @@ for result, image_path in zip(results, image_file_paths):
             # insert blur back into image
             image[y1:y2, x1:x2] = blur
     now = datetime.datetime.now()
-    cv2.imwrite(f"./results/{now.year}-{now.month}-{now.day}-{now.hour}-{now.minute}-{now.second}-{now.microsecond}.{get_file_extension(image_path)}", image)
-
+    file_name = f"./results/{now.year}-{now.month}-{now.day}-{now.hour}-{now.minute}-{now.second}-{now.microsecond}.{get_file_extension(image_path)}"
+    cv2.imwrite(file_name, image)
+    print(file_name)
