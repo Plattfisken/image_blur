@@ -23,5 +23,10 @@ fastapi dev blur_api.py
 
 ### Exempel på request:
 ```console
-curl -X 'POST' 'http://127.0.0.1:8000' -H "accept: application/json" -H "Content-Type: multipart/form-data" -F "images=@./Image1.jpg;type=image/jpeg" -F "images=@./Image2.jpg;type=image/jpeg" --output images.zip
+curl -X 'POST' \
+  'http://127.0.0.1:8000/?threshold=0.8' \
+  -H 'accept: application/json' \
+  -H 'Content-Type: multipart/form-data' \
+  -F 'image_files=@img1.jpg;type=image/jpeg' \
+  -F 'image_files=@img2.jpg;type=image/jpeg'
 ```
