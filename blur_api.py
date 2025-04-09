@@ -9,12 +9,14 @@ import zipfile
 app = FastAPI()
 
 @app.post("/")
-def blur_image(images: List[UploadFile] = File(...)):
-    blurred_images = blur.blur_images([Image.open(image.file) for image in images])
+def blur_image(threshold: float, image_files: List[UploadFile] = File(...)):
+    images = [Image.open(image_file.file) for image_file in image_files]
+    results = blur.detect_objects(images)
+    blurred_images = blur.blur_images(images, results, threshold)
 
     zipped_files = BytesIO()
     with zipfile.ZipFile(zipped_files, mode="w", compression=zipfile.ZIP_DEFLATED) as temp:
-        for image, blurred_image in zip(images, blurred_images):
+        for image, blurred_image in zip(image_files, blurred_images):
             image_as_bytes = BytesIO()
             blurred_image.save(image_as_bytes, "jpeg")
             image_as_bytes.seek(0)
