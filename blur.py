@@ -7,11 +7,11 @@ import numpy as np
 processor = DetrImageProcessor.from_pretrained("facebook/detr-resnet-50", revision="no_timm")
 model = DetrForObjectDetection.from_pretrained("facebook/detr-resnet-50", revision="no_timm")
 
-def pil_to_cv2(pil_images):
-    return [cv2.cvtColor(np.array(pil_img), cv2.COLOR_RGB2BGR) for pil_img in pil_images]
+def pil_to_cv2(pil_img):
+    return cv2.cvtColor(np.array(pil_img), cv2.COLOR_RGB2BGR)
 
-def cv2_to_pil(cv2_images):
-    return [Image.fromarray(cv2.cvtColor(cv2_img, cv2.COLOR_BGR2RGB)) for cv2_img in cv2_images]
+def cv2_to_pil(cv2_img):
+    return Image.fromarray(cv2.cvtColor(cv2_img, cv2.COLOR_BGR2RGB))
 
 def detect_objects(images):
     inputs = processor(images=images, return_tensors="pt")
@@ -24,12 +24,14 @@ def detect_objects(images):
     results = processor.post_process_object_detection(outputs, target_sizes=target_sizes, threshold=0.1)
     return results
 
-def blur_images(images, results, threshold):
+def blur_images(images, file_names, results, threshold):
     blurred_images = []
     uncertain_images = []
-    for result, cv2_image in zip(results, pil_to_cv2(images)):
+    for result, image, file_name in zip(results, images, file_names):
+        cv2_image = pil_to_cv2(image)
         ksize = (30, 30)
         uncertain_image = cv2_image.copy()
+        uncertain_rect_added = False;
         for box, label, score in zip(result["boxes"], result["labels"], result["scores"]):
             if(model.config.id2label[label.item()] == "person"):
                 print( f"Detected {model.config.id2label[label.item()]} with confidence" f"{round(score.item(), 3)} at location {box}")
@@ -47,9 +49,11 @@ def blur_images(images, results, threshold):
                     # insert blur back into image
                     cv2_image[y1:y2, x1:x2] = blur
                 elif(score.item() > 0.3):
+                    uncertain_rect_added = True
                     print(f"confidence {score.item()} lower than threshold {threshold}. higlighting rectangle")
                     start_point = (x1, y1); end_point = (x2, y2); color = (0, 255, 0); thickness = 2
                     cv2.rectangle(uncertain_image, start_point, end_point, color, thickness)
-        uncertain_images.append(uncertain_image)
-        blurred_images.append(cv2_image)
-    return (cv2_to_pil(blurred_images), cv2_to_pil(uncertain_images))
+        if(uncertain_rect_added):
+            uncertain_images.append((cv2_to_pil(uncertain_image), file_name))
+        blurred_images.append((cv2_to_pil(cv2_image), file_name))
+    return (blurred_images, uncertain_images)
