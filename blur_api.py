@@ -27,8 +27,6 @@ def blur_image(blur_threshold: float, highlight_threshold: float, image_files: L
     blurred_images = blur.blur_rects_in_images(images_by_file_name, rects_by_file_name_high_certainty)
     highlighted_images = blur.highlight_rects_in_images(images_by_file_name, rects_by_file_name_low_certainty)
 
-    # (blurred_images, uncertain_images) = blur.blur_images(images, file_names, results, threshold)
-
     zipped_files = BytesIO()
     with zipfile.ZipFile(zipped_files, mode="w", compression=zipfile.ZIP_DEFLATED) as temp:
         temp.mkdir("high_certainty")
