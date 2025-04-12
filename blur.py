@@ -26,20 +26,19 @@ def detect_objects(images):
 
 # extracts the rectangles that contain a person into two dictionaries with file_name as key and a list of rectangles as values;
 # one of high certainty where the score > threshold, and one of low where score <= threshold but > lower_bound
-def get_rects(file_names: list[str], results, threshold: float, lower_bound: float) -> tuple[dict[str, list], dict[str, list]]:
-    boxes_by_file_name_high_certainty = dict.fromkeys(file_names, [])
-    boxes_by_file_name_low_certainty = dict.fromkeys(file_names, [])
+def get_rects(results_by_file_names, blur_threshold: float, highlight_threshold: float) -> tuple[dict[str, list], dict[str, list]]:
+    boxes_by_file_name_high_certainty = {}
+    boxes_by_file_name_low_certainty = {}
 
-    for file_name, result in zip(file_names, results):
+    for file_name in results_by_file_names.keys():
+        result = results_by_file_names[file_name]
         for box, label, score in zip(result["boxes"], result["labels"], result["scores"]):
-
             if(model.config.id2label[label.item()] == "person"):
-                if(score.item() > threshold):
-                    boxes_by_file_name_high_certainty[file_name].append(box)
+                if(score.item() > blur_threshold):
+                    boxes_by_file_name_high_certainty.setdefault(file_name, []).append(box)
 
-                elif(score.item() > lower_bound):
-                    boxes_by_file_name_low_certainty[file_name].append(box)
-
+                elif(score.item() > highlight_threshold):
+                    boxes_by_file_name_low_certainty.setdefault(file_name, []).append(box)
     return boxes_by_file_name_high_certainty, boxes_by_file_name_low_certainty
 
 def blur_rects_in_images(images_by_file_name, boxes_by_file_name):

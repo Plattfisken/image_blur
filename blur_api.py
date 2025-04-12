@@ -1,6 +1,6 @@
 import blur
 from PIL import Image
-from fastapi import FastAPI, UploadFile, File
+from fastapi import FastAPI, UploadFile, File, HTTPException
 from fastapi.responses import StreamingResponse
 from io import BytesIO
 from typing import List
@@ -9,14 +9,20 @@ import zipfile
 app = FastAPI()
 
 @app.post("/")
-def blur_image(threshold: float, image_files: List[UploadFile] = File(...)):
+def blur_image(blur_threshold: float, highlight_threshold: float, image_files: List[UploadFile] = File(...)):
+    if(blur_threshold <= highlight_threshold):
+        raise HTTPException(status_code=400, detail="highlight_threshold must be lower than blur_threshold")
+
     images = [Image.open(image_file.file) for image_file in image_files]
     file_names = [file.filename for file in image_files]
+    print(file_names)
     images_by_file_name = dict(zip(file_names, images))
+    print(images_by_file_name)
 
     results = blur.detect_objects(images)
+    results_by_file_name = dict(zip(file_names, results))
 
-    rects_by_file_name_high_certainty, rects_by_file_name_low_certainty = blur.get_rects(file_names, results, threshold, 0.3)
+    rects_by_file_name_high_certainty, rects_by_file_name_low_certainty = blur.get_rects(results_by_file_name, blur_threshold, highlight_threshold)
 
     blurred_images = blur.blur_rects_in_images(images_by_file_name, rects_by_file_name_high_certainty)
     highlighted_images = blur.highlight_rects_in_images(images_by_file_name, rects_by_file_name_low_certainty)
