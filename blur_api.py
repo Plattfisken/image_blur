@@ -15,9 +15,7 @@ def blur_image(blur_threshold: float, highlight_threshold: float, image_files: L
 
     images = [Image.open(image_file.file) for image_file in image_files]
     file_names = [file.filename for file in image_files]
-    print(file_names)
     images_by_file_name = dict(zip(file_names, images))
-    print(images_by_file_name)
 
     results = blur.detect_objects(images)
     results_by_file_name = dict(zip(file_names, results))
@@ -29,18 +27,14 @@ def blur_image(blur_threshold: float, highlight_threshold: float, image_files: L
 
     zipped_files = BytesIO()
     with zipfile.ZipFile(zipped_files, mode="w", compression=zipfile.ZIP_DEFLATED) as temp:
-        temp.mkdir("high_certainty")
-        for file_name in blurred_images.keys():
-            image = blurred_images[file_name]
-            image_as_bytes = BytesIO()
-            image.save(image_as_bytes, "jpeg")
-            image_as_bytes.seek(0)
-            temp.writestr(f"high_certainty/{file_name}", image_as_bytes.getvalue())
-        temp.mkdir("low_certainty")
-        for file_name in highlighted_images.keys():
-            image = highlighted_images[file_name]
-            image_as_bytes = BytesIO()
-            image.save(image_as_bytes, "jpeg")
-            image_as_bytes.seek(0)
-            temp.writestr(f"low_certainty/uncertain_{file_name}", image_as_bytes.getvalue())
+        def compress_images_in_directory(directory_name, imgs_by_file_name):
+            temp.mkdir(directory_name)
+            for file_name in imgs_by_file_name.keys():
+                image = imgs_by_file_name[file_name]
+                image_as_bytes = BytesIO()
+                image.save(image_as_bytes, "jpeg")
+                image_as_bytes.seek(0)
+                temp.writestr(f"{directory_name}/{file_name}", image_as_bytes.getvalue())
+        compress_images_in_directory("high_certainty", blurred_images)
+        compress_images_in_directory("low_certainty", highlighted_images)
     return StreamingResponse(iter([zipped_files.getvalue()]), media_type="application/x-zip-compressed", headers={ "Content-Disposition": f"attachment; filename=images.zip"})

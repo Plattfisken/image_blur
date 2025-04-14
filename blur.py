@@ -32,50 +32,47 @@ def get_rects(results_by_file_names, blur_threshold: float, highlight_threshold:
 
     for file_name in results_by_file_names.keys():
         result = results_by_file_names[file_name]
+
         for box, label, score in zip(result["boxes"], result["labels"], result["scores"]):
             if(model.config.id2label[label.item()] == "person"):
                 if(score.item() > blur_threshold):
                     boxes_by_file_name_high_certainty.setdefault(file_name, []).append(box)
-
                 elif(score.item() > highlight_threshold):
                     boxes_by_file_name_low_certainty.setdefault(file_name, []).append(box)
+
     return boxes_by_file_name_high_certainty, boxes_by_file_name_low_certainty
 
 def blur_rects_in_images(images_by_file_name, boxes_by_file_name):
     blurred_images = {}
     ksize = (30, 30)
 
-    for image_file_name in boxes_by_file_name.keys():
-        image = pil_to_cv2(images_by_file_name[image_file_name])
+    for file_name in boxes_by_file_name.keys():
+        image = pil_to_cv2(images_by_file_name[file_name])
 
-        print(f"{len(boxes_by_file_name[image_file_name])} rects in image: {image_file_name}")
-        for box in boxes_by_file_name[image_file_name]:
+        for box in boxes_by_file_name[file_name]:
             box = [max(round(i), 0) for i in box.tolist()]
             x1, y1, x2, y2 = box[0], box[1], box[2], box[3]
-            print(f"x1:{x1} y1:{y1} x2:{x2} y2:{y2}")
             # rectangle to blur from image
             roi = image[y1:y2, x1:x2]
-            print(f"{roi}")
             blur = cv2.blur(roi, ksize)
             image[y1:y2, x1:x2] = blur
 
-        blurred_images[image_file_name] = cv2_to_pil(image)
+        blurred_images[file_name] = cv2_to_pil(image)
 
     return blurred_images
 
 def highlight_rects_in_images(images_by_file_name, boxes_by_file_name):
     highlighted_images = {}
 
-    for image_file_name in boxes_by_file_name.keys():
-        image = pil_to_cv2(images_by_file_name[image_file_name])
+    for file_name in boxes_by_file_name.keys():
+        image = pil_to_cv2(images_by_file_name[file_name])
 
-        for box in boxes_by_file_name[image_file_name]:
+        for box in boxes_by_file_name[file_name]:
             box = [max(round(i), 0) for i in box.tolist()]
             x1, y1, x2, y2 = box[0], box[1], box[2], box[3]
             start_point = (x1, y1); end_point = (x2, y2); color = (0, 255, 0); thickness = 2
             cv2.rectangle(image, start_point, end_point, color, thickness)
-            # rectangle to blur from image
 
-        highlighted_images[image_file_name] = cv2_to_pil(image)
+        highlighted_images[file_name] = cv2_to_pil(image)
 
     return highlighted_images
