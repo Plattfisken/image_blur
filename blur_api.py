@@ -5,11 +5,28 @@ from fastapi.responses import StreamingResponse
 from io import BytesIO
 from typing import List
 import zipfile
+import uuid
+import json
 
 app = FastAPI()
 
 @app.post("/")
-def blur_image(blur_threshold: float, highlight_threshold: float, image_files: List[UploadFile] = File(...)):
+def blur_image(application_name: str, guid: str, blur_threshold: float, highlight_threshold: float, image_files: List[UploadFile] = File(...)):
+    with open("auth_test_data.json", mode="r") as json_file:
+        authorized_apps = json.load(json_file)
+    try:
+        app_guid = authorized_apps[application_name]
+    except:
+        raise HTTPException(status_code=400, detail="application_name invalid")
+
+    try:
+        request_guid = uuid.UUID(guid)
+    except:
+        raise HTTPException(status_code=400, detail="guid invalid")
+
+    if(uuid.UUID(app_guid) != request_guid):
+        raise HTTPException(status_code=401)
+
     if(blur_threshold <= highlight_threshold):
         raise HTTPException(status_code=400, detail="highlight_threshold must be lower than blur_threshold")
 
