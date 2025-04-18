@@ -13,7 +13,12 @@ def pil_to_cv2(pil_img):
 def cv2_to_pil(cv2_img):
     return Image.fromarray(cv2.cvtColor(cv2_img, cv2.COLOR_BGR2RGB))
 
-def detect_objects(images):
+def detect_objects(images_by_file_name):
+    file_names = images_by_file_name.keys()
+    images = []
+    for file_name in file_names:
+        images.append(images_by_file_name[file_name])
+
     inputs = processor(images=images, return_tensors="pt")
     outputs = model(**inputs)
 
@@ -22,7 +27,8 @@ def detect_objects(images):
     target_sizes = torch.tensor(sizes)
 
     results = processor.post_process_object_detection(outputs, target_sizes=target_sizes, threshold=0.1)
-    return results
+    results_by_file_names = dict(zip(file_names, results))
+    return results_by_file_names
 
 # extracts the rectangles that contain a person into two dictionaries with file_name as key and a list of rectangles as values;
 # one of high certainty where the score > threshold, and one of low where score <= threshold but > lower_bound
