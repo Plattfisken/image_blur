@@ -3,3 +3,5 @@ results
 test_images
 __pycache__
 .DS_Store
+files
+todo.txt
