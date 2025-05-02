@@ -56,7 +56,10 @@ def blur_rects_in_images(images_by_file_name, boxes_by_file_name):
         image = pil_to_cv2(images_by_file_name[file_name])
 
         for box in boxes_by_file_name[file_name]:
-            box = [max(round(i), 0) for i in box.tolist()]
+            if not isinstance(box, list):
+                box = box.tolist()
+
+            box = [max(round(i), 0) for i in box]
             x1, y1, x2, y2 = box[0], box[1], box[2], box[3]
             # rectangle to blur from image
             roi = image[y1:y2, x1:x2]
