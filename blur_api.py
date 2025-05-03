@@ -30,13 +30,15 @@ async def get_result_if_ready(application_name: str, application_guid: str, requ
     except:
         raise HTTPException(status_code=400, detail="request_guid invalid")
 
-    # NOTE: there is a __slight__ risk here that the thread responsible for deleting files deletes this file right after the check but before
-    # it has been returned.
-    path = f"files/{id.hex}.zip"
-    if os.path.isfile(path):
-        return FileResponse(path, media_type="application/x-zip-compressed", filename="result.zip")
+    # NOTE: maybe there is a __slight__ risk here that the thread responsible for deleting files deletes this file right after the check but
+    # before it has been returned.
+    path = f"files/{id.hex}"
+    if os.path.isdir(path):
+        return "Item not ready" 
+    elif os.path.isfile(f"{path}.zip"):
+        return FileResponse(f"{path}.zip", media_type="application/x-zip-compressed", filename="result.zip")
     else:
-        return "Item not ready or invalid GUID"
+        raise HTTPException(status_code=400, detail="request_guid not representing an item in the queue")
 
 @app.post("/enqueue")
 async def enqueue_images(application_name: str, application_guid: str, blur_threshold: float, highlight_threshold: float, image_upload_files: List[UploadFile] = File(...)):
