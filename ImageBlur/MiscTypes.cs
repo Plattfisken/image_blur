@@ -4,7 +4,6 @@ namespace ImageBlur;
 
 public readonly struct FileData(byte[] fileBytes, string name, string contentType)
 {
-    // TODO: should this really be a stream? Or byte array? Something else?
     public byte[] FileBytes { get; } = fileBytes;
     public string Name { get; } = name;
     public string ContentType { get; } = contentType;
