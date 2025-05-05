@@ -1,13 +1,12 @@
-﻿@using System.Drawing
-@using System.Numerics
-@using ImageBlur
-@inject HttpClient HttpClient
+﻿@inject HttpClient HttpClient
 @inject IJSRuntime JS
 @page "/"
+@using System.Numerics
+@using ImageBlur
 
 <PageTitle>Home</PageTitle>
 
-<InputFile OnChange="BlurImages" multiple />
+<InputFile OnChange="BlurImages" multiple/>
 @if (_inputImageCount > 0)
 {
     if (files is null)
@@ -24,17 +23,20 @@
             <p>File: @file.Image.Name</p>
             <p>Reason: @file.ErrorType</p>
         }
+
         <button @onclick="PrevImage">Prev</button>
         <button @onclick="NextImage">Next</button>
     }
+
     <div class="p-3">
         <img id="displayedImage" alt="Image will be displayed here" @onclick="ImageClicked"/>
     </div>
     @if (showingHighlighted)
     {
         foreach (var rect in _result.HighlightedImages[imgIdx].HighlightedRectangles)
-        {  
-            <p>@rect.X, @rect.Y, @rect.Right, @rect.Bottom</p><br/>
+        {
+            <p>@rect.X, @rect.Y, @rect.Right, @rect.Bottom</p>
+            <br/>
         }
     }
 }
@@ -46,13 +48,13 @@
     private const string AppGuid = "d574a738-a7a9-40f1-a4ee-8773b05b029d";
     private const string BaseUrl = "http://localhost:8000";
 
-    int imgIdx = 0;
-    FileData[]? files = null;
+    int imgIdx;
+    FileData[]? files;
 
-    bool showingHighlighted = false;
+    bool showingHighlighted;
 
-    ImageBlurResult? _result = null;
-    int _inputImageCount = 0;
+    ImageBlurResult? _result;
+    int _inputImageCount;
 
     async Task ImageClicked(MouseEventArgs e)
     {
@@ -65,9 +67,9 @@
         if (clickedRects.Length > 0)
         {
             var result = await ImageBlur.BlurRectanglesInImage(
-            HttpClient, BaseUrl, AppName, AppGuid, clickedRects,
-            _result.ResultImages.Single(
-            i => i.Name == _result.HighlightedImages[imgIdx].Image.Name));
+                HttpClient, BaseUrl, AppName, AppGuid, clickedRects,
+                _result.ResultImages.Single(
+                    i => i.Name == _result.HighlightedImages[imgIdx].Image.Name));
             await SetImage(result.FileBytes, result.ContentType);
         }
     }
@@ -81,7 +83,7 @@
         public double Top { get; set; }
         public double Right { get; set; }
         public double Bottom { get; set; }
-        public double Left { get; set; } 
+        public double Left { get; set; }
     }
 
     async Task SetImage(byte[] imageBytes, string contentType)
@@ -90,6 +92,7 @@
         using var strRef = new DotNetStreamReference(imageStream);
         await JS.InvokeVoidAsync("setSource", "displayedImage", strRef, contentType, "title");
     }
+
     private async Task PrevImage()
     {
         if (files is not null)
@@ -99,6 +102,7 @@
             await SetImage(image.FileBytes, image.ContentType);
         }
     }
+
     private async Task NextImage()
     {
         if (files is not null)
@@ -116,7 +120,8 @@
             _result.Dispose();
             _result = null;
         }
-        _inputImageCount = e.FileCount; 
+
+        _inputImageCount = e.FileCount;
         var fileData = await Task.WhenAll(
             e.GetMultipleFiles(100).Select(async f =>
             {
@@ -125,33 +130,33 @@
                 await stream.ReadExactlyAsync(buffer, 0, (int)f.Size);
                 return new FileData(buffer, f.Name, f.ContentType);
             }).ToArray());
-         _result = await ImageBlur.BlurImagesAndAwaitResult(
-            HttpClient, 
-            BaseUrl, 
+        _result = await ImageBlur.BlurImagesAndAwaitResult(
+            HttpClient,
+            BaseUrl,
             AppName,
-            AppGuid, 
+            AppGuid,
             0.9f,
             0.5f,
             fileData);
 
-         files = _result.ResultImages;
-         var image = files[imgIdx];
-         await SetImage(image.FileBytes, image.ContentType);
+        files = _result.ResultImages;
+        var image = files[imgIdx];
+        await SetImage(image.FileBytes, image.ContentType);
     }
 
     async Task SwitchToResults()
     {
-       showingHighlighted = false;
-       if(_result is null) return;
-       files = _result.ResultImages;
-       imgIdx = -1;
-       await NextImage();
+        showingHighlighted = false;
+        if (_result is null) return;
+        files = _result.ResultImages;
+        imgIdx = -1;
+        await NextImage();
     }
 
     async Task SwitchToReview()
     {
         showingHighlighted = true;
-        if(_result is null) return;
+        if (_result is null) return;
         files = _result.HighlightedImages.Select(f => f.Image).ToArray();
         imgIdx = -1;
         await NextImage();
