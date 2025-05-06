@@ -91,7 +91,10 @@ async def blur_rect(application_name: str, application_guid: str, rect_file: Upl
         raise HTTPException(status_code=401)
 
     image_by_file_name = {}
-    image_by_file_name[image_file.filename] = Image.open(image_file.file).convert("RGB")
+    try:
+        image_by_file_name[image_file.filename] = Image.open(image_file.file).convert("RGB")
+    except:
+        raise HTTPException(status_code=400, detail="Invalid file format")
 
     rect_as_strings = (await rect_file.read()).decode().splitlines()
     rects = []
