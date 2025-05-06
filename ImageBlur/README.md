@@ -18,7 +18,7 @@ Task<string> BlurImages(
 Anropar [`/enqueue`](https://github.com/Plattfisken/image_blur/tree/main/image_blur#enqueue)-endpoint asynkront och returnerar en sträng som innehåller GUID:en som används för att sedan hämta ut resultatet.
 
 ### CheckResult
-```
+```c#
 Task<ImageBlurResult?> CheckResult(
   HttpClient httpClient,
   string baseUrl,
@@ -29,7 +29,7 @@ Task<ImageBlurResult?> CheckResult(
 Anropar [`/result`](https://github.com/Plattfisken/image_blur/tree/main/image_blur#result)-endpoint asynkront och returnerar en [`ImageBlurResult`](#ImageBlurResult) om ärendet har hanterats, annars `null`.
 
 ### AwaitResult
-```
+```c#
 Task<ImageBlurResult> AwaitResult(
   HttpClient httpClient,
   string baseUrl,
@@ -41,7 +41,7 @@ Task<ImageBlurResult> AwaitResult(
 Anropar [`CheckResult`](#CheckResult) asynkront, med ett millisekundersinterval av `checkIntervalMs` tills resultatet inte är null, eller tills det att `timeoutSeconds` har passerats. Returnerar en [`ImageBlurResult`](#ImageBlurResult)
 
 ### BlurImagesAndAwaitResult
-```
+```c#
 Task<ImageBlurResult> BlurImagesAndAwaitResult(
   HttpClient httpClient,
   string baseUrl,
@@ -56,7 +56,7 @@ Task<ImageBlurResult> BlurImagesAndAwaitResult(
 Anropar först [`BlurImages`](#BlurImages) asynkront, och sedan [`AwaitResult`](#AwaitResult) asynkront. Returnerar en [`ImageBlurResult`](#ImageBlurResult)
 
 ### BlurRectanglesInImage
-```
+```c#
 Task<FileData> BlurRectanglesInImage(
   HttpClient httpClient,
   string baseUrl,
@@ -70,7 +70,7 @@ Anropar [`/blur_rects_in_image`](https://github.com/Plattfisken/image_blur/tree/
 ## Typer
 
 ### ImageBlurResult
-```
+```c#
 public record ImageBlurResult : IDisposable
 {
   public ZipArchive ResultFile { get; }
@@ -82,7 +82,7 @@ public record ImageBlurResult : IDisposable
 Representerar ett resultat från ett ärende. `ResultFile` innehåller zipfilen. Konstruktorn packar däremot upp allt som zipfilen innehåller, det går därför bra att använda sig av resultatet utan att behöva bry sig om zipfilen. `IDisposable` implementeras, då `ZipArchive` behöver göras av med.
 
 ### HighlightedImage
-```
+```c#
 public readonly struct HighlightedImage(FileData fileData, RectangleF[] highlightedRectangles)
 {
   public FileData Image { get; } = fileData;
@@ -92,7 +92,7 @@ public readonly struct HighlightedImage(FileData fileData, RectangleF[] highligh
 Representerar en bild som har blivit markerad, innehåller den markerade bilden tillsammans med en array av rektanglar som innehåller de koordinater som har markerats.
 
 ### UnhandledImage
-```
+```c#
 public readonly struct UnhandledImage(FileData fileData, ErrorType errorType)
 {
   public FileData Image { get; } = fileData;
@@ -102,7 +102,7 @@ public readonly struct UnhandledImage(FileData fileData, ErrorType errorType)
 Representerar en fil som inte hanterades av API:et. [`ErrorType`](#ErrorType) beskriver anledningen.
 
 ### FileData
-```
+```c#
 public readonly struct FileData(byte[] fileBytes, string name, string contentType)
 {
     public byte[] FileBytes { get; } = fileBytes;
@@ -113,7 +113,7 @@ public readonly struct FileData(byte[] fileBytes, string name, string contentTyp
 Innehåller informationen som behövs om en specifik fil. `FileBytes`: filens råa data. `Name`: filens namn. `ContentType`: filens MIME-type ("image/jpeg", t.ex).
 
 ### ErrorType
-```
+```c#
 public enum ErrorType
 {
   TooLarge,
