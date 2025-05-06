@@ -5,7 +5,7 @@ Du använder biblioteket genom att anropa de statiska metoderna i den statiska k
 ## Metoder
 
 ### BlurImages
-```
+```c#
 Task<string> BlurImages(
   HttpClient httpClient,
   string baseUrl,
