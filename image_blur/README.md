@@ -23,9 +23,9 @@ fastapi dev blur_api.py
 
 ## Dokumentation:
 API:et exponerar tre endpoints:
-* **/enqueue** - Skapa ett ärende med en eller flera bilder. Ärenden kommer läggas i en kö och hanteras vid sin tur.
-* **/result** - Kolla om ett ärende är färdigt; om det är det så får du tillbaka ett resultat, annars får du ett svar som säger att det inte är färdigt ännu.
-* **/blur_rects_in_image** - Specificera rektanglar att sudda ut ur en bild. Du får tillbaka bilden med de specificerade rektanglarna utsuddade.
+* [**/enqueue**](#enqueue) - Skapa ett ärende med en eller flera bilder. Ärenden kommer läggas i en kö och hanteras vid sin tur.
+* [**/result**](#result) - Kolla om ett ärende är färdigt; om det är det så får du tillbaka ett resultat, annars får du ett svar som säger att det inte är färdigt ännu.
+* [**/blur_rects_in_image**](#blur_rects_in_image) - Specificera rektanglar att sudda ut ur en bild. Du får tillbaka bilden med de specificerade rektanglarna utsuddade.
 
 Alla endpoints tar emot dessa query parametrar:
 * application_name: Namn på applikationen som utfärdar ärendet.
