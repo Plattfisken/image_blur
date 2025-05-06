@@ -1,4 +1,4 @@
-## Dokumentation
+# Dokumentation
 Detta är ett litet bibliotek för att interagera med [_image_blur_](https://github.com/Plattfisken/image_blur/tree/main/image_blur).
 
 Du använder biblioteket genom att anropa de statiska metoderna i den statiska klassen ImageBlur. Ingenting annat behöver göras.
