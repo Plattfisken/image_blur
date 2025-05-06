@@ -50,21 +50,27 @@ def queue_handler():
         # one with a low threshold and one with a high threshold
         images_by_file_name = dict(zip(file_names, images))
 
-        results_by_file_name = blur.detect_objects(images_by_file_name)
+        # if no valid files exist we need to define the dicts so the zipfile can be created.
+        if len(file_names) > 0:
+            results_by_file_name = blur.detect_objects(images_by_file_name)
 
-        rects_by_file_name_high_certainty, rects_by_file_name_low_certainty = blur.get_rects(
-            results_by_file_name, item.blur_threshold, item.highlight_threshold)
+            rects_by_file_name_high_certainty, rects_by_file_name_low_certainty = blur.get_rects(
+                results_by_file_name, item.blur_threshold, item.highlight_threshold)
 
-        # blur the rectangles in the list with high certainty, and highlight the rectangles in the list with low certainty
-        blurred_images = blur.blur_rects_in_images(images_by_file_name, rects_by_file_name_high_certainty)
-        highlighted_images = blur.highlight_rects_in_images(images_by_file_name, rects_by_file_name_low_certainty)
+            # blur the rectangles in the list with high certainty, and highlight the rectangles in the list with low certainty
+            blurred_images = blur.blur_rects_in_images(images_by_file_name, rects_by_file_name_high_certainty)
+            highlighted_images = blur.highlight_rects_in_images(images_by_file_name, rects_by_file_name_low_certainty)
 
-        # result_images contains every input file that was successfully handled, with the blurred version for those images where a person was
-        # detected with high certainty.
-        # Files that were not handled (too large, or couldn't be opened), are not part of this list, as they require manual review.
-        result_images = images_by_file_name
-        for key in blurred_images.keys():
-            result_images[key] = blurred_images[key]
+            # result_images contains every input file that was successfully handled, with the blurred version for those images where a person was
+            # detected with high certainty.
+            # Files that were not handled (too large, or couldn't be opened), are not part of this list, as they require manual review.
+            result_images = images_by_file_name
+            for key in blurred_images.keys():
+                result_images[key] = blurred_images[key]
+        else:
+            result_images = {}
+            highlighted_images = {}
+            rects_by_file_name_low_certainty = {}
 
         # create compressed files containing all results in different directories:
         # result:

@@ -119,6 +119,7 @@
         {
             _result.Dispose();
             _result = null;
+            files = null;
         }
 
         _inputImageCount = e.FileCount;
@@ -140,8 +141,11 @@
             fileData);
 
         files = _result.ResultImages;
-        var image = files[imgIdx];
-        await SetImage(image.FileBytes, image.ContentType);
+        if (files.Length > 0)
+        {
+            var image = files[imgIdx];            
+            await SetImage(image.FileBytes, image.ContentType);
+        }
     }
 
     async Task SwitchToResults()
