@@ -79,7 +79,7 @@ public record ImageBlurResult : IDisposable
   public UnhandledImage[] UnhandledImages { get; }
 }
 ```
-Representerar ett resultat från ett ärende. `ResultFile` innehåller zipfilen. Konstruktorn packar däremot upp allt som zipfilen innehåller, det går därför bra att använda sig av resultatet utan att behöva bry sig om zipfilen. `IDisposable` implementeras, då `ZipArchive` behöver göras av med.
+Representerar ett resultat från ett ärende. `ResultFile` innehåller zipfilen. Konstruktorn packar däremot upp allt som zipfilen innehåller, det går därför bra att använda sig av resultatet utan att behöva bry sig om zipfilen. `ResultImages` innehåller alla bilder som har blivit hanterade. `HighlightedImages` innehåller de bilder som har markerats. `UnhandledImages`innehåller de filer som inte har hanterats. `IDisposable` implementeras, då en `ZipArchive` behöver göras av med.
 
 ### HighlightedImage
 ```c#
