@@ -15,7 +15,7 @@ Task<string> BlurImages(
   float highlightThreshold,
   FileData[] files)
 ```
-Anropar `[/enqueue](https://github.com/Plattfisken/image_blur/tree/main/image_blur#enqueue)`-endpoint asynkront och returnerar en sträng som innehåller GUID:en som används för att sedan hämta ut resultatet.
+Anropar [`/enqueue`](https://github.com/Plattfisken/image_blur/tree/main/image_blur#enqueue)-endpoint asynkront och returnerar en sträng som innehåller GUID:en som används för att sedan hämta ut resultatet.
 
 ### CheckResult
 ```
@@ -26,7 +26,7 @@ Task<ImageBlurResult?> CheckResult(
   string applicationGuid,
   string requestGuid)
 ```
-Anropar `[/result](https://github.com/Plattfisken/image_blur/tree/main/image_blur#result)`-endpoint asynkront och returnerar en `[ImageBlurResult](#ImageBlurResult)` om ärendet har hanterats, annars `null`.
+Anropar [`/result`](https://github.com/Plattfisken/image_blur/tree/main/image_blur#result)-endpoint asynkront och returnerar en [`ImageBlurResult`](#ImageBlurResult) om ärendet har hanterats, annars `null`.
 
 ### AwaitResult
 ```
@@ -38,7 +38,7 @@ Task<ImageBlurResult> AwaitResult(
   int timeoutSeconds = 60,
   int checkIntervalMs = 300)
 ```
-Anropar `[CheckResult](#CheckResult)` asynkront, med ett millisekundersinterval av `checkIntervalMs` tills resultatet inte är null, eller tills det att _timeoutSeconds_ har passerats. Returnerar en `[ImageBlurResult](#ImageBlurResult)`
+Anropar [`CheckResult`](#CheckResult) asynkront, med ett millisekundersinterval av `checkIntervalMs` tills resultatet inte är null, eller tills det att `timeoutSeconds` har passerats. Returnerar en [`ImageBlurResult`](#ImageBlurResult)
 
 ### BlurImagesAndAwaitResult
 ```
@@ -53,7 +53,7 @@ Task<ImageBlurResult> BlurImagesAndAwaitResult(
   int timeoutSeconds = 60,
   int checkIntervalMs = 300)
 ```
-Anropar först `[BlurImages](#BlurImages)` asynkront, och sedan `[AwaitResult](#AwaitResult)` asynkront. Returnerar en `[ImageBlurResult](#ImageBlurResult)`
+Anropar först [`BlurImages`](#BlurImages) asynkront, och sedan [`AwaitResult`](#AwaitResult) asynkront. Returnerar en [`ImageBlurResult`](#ImageBlurResult)
 
 ### BlurRectanglesInImage
 ```
@@ -65,7 +65,7 @@ Task<FileData> BlurRectanglesInImage(
   RectangleF[] rectangles,
   FileData file)
 ```
-Anropar `[/blur_rects_in_image](https://github.com/Plattfisken/image_blur/tree/main/image_blur#blur_rects_in_image)`-endpoint asynkront. Returnerar en ´[FileData](#FileData)`.
+Anropar [`/blur_rects_in_image`](https://github.com/Plattfisken/image_blur/tree/main/image_blur#blur_rects_in_image)-endpoint asynkront. Returnerar en [`FileData`](#FileData).
 
 ## Typer
 
@@ -79,7 +79,7 @@ public record ImageBlurResult : IDisposable
   public UnhandledImage[] UnhandledImages { get; }
 }
 ```
-Representerar ett resultat från ett ärende. `ResultFile` innehåller zipfilen. Konstruktorn packar däremot upp allt som zipfilen innehåller, det går därför bra att använda sig av resultatet utan att behöva bry sig om zipfilen. IDisposable implementeras, då ZipArchive behöver göras av med.
+Representerar ett resultat från ett ärende. `ResultFile` innehåller zipfilen. Konstruktorn packar däremot upp allt som zipfilen innehåller, det går därför bra att använda sig av resultatet utan att behöva bry sig om zipfilen. `IDisposable` implementeras, då `ZipArchive` behöver göras av med.
 
 ### HighlightedImage
 ```
@@ -99,7 +99,7 @@ public readonly struct UnhandledImage(FileData fileData, ErrorType errorType)
   public ErrorType ErrorType { get; } = errorType;
 }
 ```
-Representerar en fil som inte hanterades av API:et. `[ErrorType](#ErrorType)` beskriver anledningen.
+Representerar en fil som inte hanterades av API:et. [`ErrorType`](#ErrorType) beskriver anledningen.
 
 ### FileData
 ```
