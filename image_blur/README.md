@@ -1,4 +1,4 @@
-## Kom igång
+# Kom igång
 
 ### Dessa program behöver finnas installerade:
 * Python
@@ -21,7 +21,7 @@ pip install -r requirements.txt
 fastapi dev blur_api.py
 ```
 
-## Dokumentation
+# Dokumentation
 API:et exponerar tre endpoints:
 * [**/enqueue**](#enqueue) - Skapa ett ärende med en eller flera bilder. Ärenden kommer läggas i en kö och hanteras vid sin tur.
 * [**/result**](#result) - Kolla om ett ärende är färdigt; om det är det så får du tillbaka ett resultat, annars får du ett svar som säger att det inte är färdigt ännu.
